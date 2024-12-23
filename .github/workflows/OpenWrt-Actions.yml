@@ -461,7 +461,7 @@ jobs:
                                   ⏰编译用时：${{ env.BUILD_TIME }}\n\
                                   🎉发布地址：${{ env.GITHUB_RELEASE }}\n\
                                   🌴固件已经编译完成🎈！！！",
-                  "url": "https://github.com/gxnas/OpenWrt_Build_x64/releases/tag/OpenWrt_2305_x64_test"
+                  "url": "https://github.com/nihaoya9527/OpenWrt-AutoBuild/releases/tag/$%7B%7B%20env.FILE_TIME2%20%7D%7D-$%7B%7Bmatrix.target%7D%7D"
                 }
               ]
             }
