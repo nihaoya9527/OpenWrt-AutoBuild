@@ -26,8 +26,8 @@ on:
         type: boolean
 
 # 定时触发编译(1,10,20早3点)
-  schedule:
-    - cron: 0 17 1,11,21 * *
+  #schedule:
+    #- cron: 0 17 1,11,21 * *
 
 # 点赞☆Star触发编译
 #  watch:
@@ -85,7 +85,6 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        # 更新 APT 源为可靠镜像（以 Ubuntu 为例）
         sudo -E tee /etc/apt/sources.list <<EOF
         deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main restricted universe multiverse
         deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-updates main restricted universe multiverse
@@ -93,24 +92,13 @@ jobs:
         deb http://security.ubuntu.com/ubuntu $(lsb_release -sc)-security main restricted universe multiverse
         EOF
     
-        # 更新包信息
         sudo -E apt update
-    
-        # 安装必要工具确保系统环境正常
         sudo -E apt -y install software-properties-common apt-transport-https ca-certificates curl
-    
-        # 清理无用目录
         sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
-    
-        # 如果有 Docker 镜像，安全删除
         if [ -n "$(docker images -q)" ]; then
           docker rmi $(docker images -q)
         fi
-    
-        # 设置 grub 持久化，忽略警告
         sudo -E apt-mark hold grub-efi-amd64-signed || true
-    
-        # 安装所有必要的软件包
         sudo -E apt -y install \
           ack \
           antlr3 \
@@ -179,23 +167,19 @@ jobs:
           xxd \
           zlib1g-dev
     
-        # 如果软件包无法通过 apt 安装，尝试使用 snap 安装
         sudo snap install cmake || true
         sudo snap install device-tree-compiler || true
-    
-        # 重载 systemd 服务
         sudo -E systemctl daemon-reload
-    
-        # 自动清理无用包和缓存
         sudo -E apt -y autoremove --purge
         sudo -E apt clean
 
     - name: 编译前准备
       run: |
-        sudo -E apt-get -y install xsltproc zip grep python3-pip python3-ply libc6-dev libncurses5 libtinfo-dev libtinfo5 ncurses-doc python2.7 git-core wget curl rsync
+        sudo -E apt-get update
+        sudo -E apt-get -y install xsltproc zip grep python3-pip python3-ply libc6-dev libncurses6 libtinfo6 ncurses-doc python-is-python3 git-core wget curl rsync
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
-        sudo timedatectl set-timezone "$TZ"
+        sudo timedatectl set-timezone Asia/Shanghai
         echo
         echo " 系统空间      类型   总数  已用  可用 使用率"
         df -hT $PWD
