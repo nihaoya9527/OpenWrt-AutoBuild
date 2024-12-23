@@ -85,41 +85,32 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        # 删除所有 Docker 镜像（如果存在）
-        if [ -n "$(docker images -q)" ]; then
-          docker rmi $(docker images -q)
-        fi
-    
-        # 删除一些目录
-        sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
-    
-        # 持久化 grub 相关包（忽略警告）
-        sudo -E apt-mark hold grub-efi-amd64-signed
+        # 更新 APT 源为可靠镜像（以 Ubuntu 为例）
+        sudo -E tee /etc/apt/sources.list <<EOF
+        deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-updates main restricted universe multiverse
+        deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc)-backports main restricted universe multiverse
+        deb http://security.ubuntu.com/ubuntu $(lsb_release -sc)-security main restricted universe multiverse
+        EOF
     
         # 更新包信息
         sudo -E apt update
     
-        # 清理系统，忽略不存在的包错误
-        sudo -E apt -y purge \
-          azure-cli* \
-          docker* \
-          ghc* \
-          zulu* \
-          llvm* \
-          firefox \
-          google* \
-          dotnet* \
-          powershell* \
-          openjdk* \
-          mysql* \
-          php* \
-          mongodb* \
-          snap* || true
+        # 安装必要工具确保系统环境正常
+        sudo -E apt -y install software-properties-common apt-transport-https ca-certificates curl
     
-        # 升级系统
-        sudo -E apt -y full-upgrade
+        # 清理无用目录
+        sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
     
-        # 安装所需依赖
+        # 如果有 Docker 镜像，安全删除
+        if [ -n "$(docker images -q)" ]; then
+          docker rmi $(docker images -q)
+        fi
+    
+        # 设置 grub 持久化，忽略警告
+        sudo -E apt-mark hold grub-efi-amd64-signed || true
+    
+        # 安装所有必要的软件包
         sudo -E apt -y install \
           ack \
           antlr3 \
@@ -188,10 +179,14 @@ jobs:
           xxd \
           zlib1g-dev
     
+        # 如果软件包无法通过 apt 安装，尝试使用 snap 安装
+        sudo snap install cmake || true
+        sudo snap install device-tree-compiler || true
+    
         # 重载 systemd 服务
         sudo -E systemctl daemon-reload
     
-        # 自动清理无用的包和缓存
+        # 自动清理无用包和缓存
         sudo -E apt -y autoremove --purge
         sudo -E apt clean
 
