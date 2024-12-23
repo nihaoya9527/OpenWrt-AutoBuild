@@ -10,8 +10,11 @@
 # sed -i 's@## src-git luci@src-git luci@g' feeds.conf.default # 启用23.05Luci
 cat feeds.conf.default
 
+# 添加自用插件
+git clone https://github.com/gxnas/OpenWrt_Build_x64_Packages/ package/gxnas-packages
+
 # 添加第三方软件包
-git clone https://github.com/db-one/dbone-packages.git -b 23.05 package/dbone-packages
+#git clone https://github.com/db-one/dbone-packages.git -b 23.05 package/dbone-packages
 
 # 更新并安装源
 ./scripts/feeds clean
@@ -36,10 +39,10 @@ else
 fi
 
 #
-sed -i 's#192.168.1.1#192.168.1.11#g' $NET                                                    # 定制默认IP
-# sed -i 's#LEDE#OpenWrt-X86#g' $NET                                                     # 修改默认名称为OpenWrt-X86
-sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' $ZZZ                                             # 取消系统默认密码
-sed -i "s/LEDE /ONE build $(TZ=UTC-8 date "+%Y.%m.%d") @ LEDE /g" $ZZZ              # 增加自己个性名称
+sed -i 's#192.168.1.1#192.168.1.11#g' $NET                                               # 定制默认IP
+sed -i 's#LEDE#OpenWrt-GXNAS#g' $NET                                                     # 修改默认名称为OpenWrt-X86
+sed -i 's@.*CYXluq4wUazHjmCDBCqXF*@#&@g' $ZZZ                                            # 取消系统默认密码
+sed -i "s/LEDE /GXNAS build $(TZ=UTC-8 date "+%Y.%m.%d") @ LEDE /g" $ZZZ                   # 增加自己个性名称
 # sed -i "/uci commit luci/i\uci set luci.main.mediaurlbase=/luci-static/neobird" $ZZZ        # 设置默认主题(如果编译可会自动修改默认主题的，有可能会失效)
 sed -i 's#localtime  = os.date()#localtime  = os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")) .. " " .. os.date("%X")#g' package/lean/autocore/files/*/index.htm               # 修改默认时间格式
 
