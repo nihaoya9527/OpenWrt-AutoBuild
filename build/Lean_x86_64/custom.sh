@@ -11,10 +11,7 @@
 cat feeds.conf.default
 
 # 添加自用插件
-git clone https://github.com/gxnas/OpenWrt_Build_x64_Packages/ package/gxnas-packages
-
-# 添加第三方软件包
-#git clone https://github.com/db-one/dbone-packages.git -b 23.05 package/dbone-packages
+git clone https://github.com/nihaoya9527/OpenWrt_Build_x64_Packages package/nihaoya9527-packages
 
 # 更新并安装源
 ./scripts/feeds clean
