@@ -4,14 +4,15 @@
 # 安装额外依赖软件包
 # sudo -E apt-get -y install rename
 
+# 添加自用插件
+sed -i "/helloworld/d" feeds.conf.default
+sed -i '$a src-git gxnas https://github.com/gxnas/OpenWrt_Build_x64_Packages' feeds.conf.default
+
 # 更新feeds文件
 # sed -i 's@#src-git helloworld@src-git helloworld@g' feeds.conf.default # 启用helloworld
 # sed -i 's@src-git luci@# src-git luci@g' feeds.conf.default # 禁用18.06Luci
 # sed -i 's@## src-git luci@src-git luci@g' feeds.conf.default # 启用23.05Luci
 cat feeds.conf.default
-
-# 添加自用插件
-git clone https://github.com/nihaoya9527/OpenWrt_Build_x64_Packages package/nihaoya9527-packages
 
 # 更新并安装源
 ./scripts/feeds clean
